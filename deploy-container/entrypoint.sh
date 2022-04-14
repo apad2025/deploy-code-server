@@ -24,7 +24,7 @@ else
     touch /home/coder/.config/rclone/rclone.conf
     echo $RCLONE_DATA | base64 -d > /home/coder/.config/rclone/rclone.conf
 
-    # default to true
+    # defasult to true
     RCLONE_VSCODE_TASKS="${RCLONE_VSCODE_TASKS:-true}"
     RCLONE_AUTO_PUSH="${RCLONE_AUTO_PUSH:-true}"
     RCLONE_AUTO_PULL="${RCLONE_AUTO_PULL:-true}"
@@ -76,23 +76,14 @@ else
 
 fi
 
-# Add dotfiles, if set
-if [ -n "$DOTFILES_REPO" ]; then
-    # grab the files from the remote instead of running project_init()
-    echo "[$PREFIX] Cloning dotfiles..."
-    mkdir -p $HOME/dotfiles
-    git clone $DOTFILES_REPO $HOME/dotfiles
+if [[ -z "${GITNAME}" ]]; then
+    echo "[$PREFIX] RCLONE_DATA is not specified. Files will not persist"
 
-    DOTFILES_SYMLINK="${RCLONE_AUTO_PULL:-true}"
-
-    # symlink repo to $HOME
-    if [ $DOTFILES_SYMLINK = "true" ]; then
-        shopt -s dotglob
-        ln -sf source_file $HOME/dotfiles/* $HOME
-    fi
-
-    # run install script, if it exists
-    [ -f "$HOME/dotfiles/install.sh" ] && $HOME/dotfiles/install.sh
+else 
+    echo "[$PREFIX] Setting git options..."
+    git config --global user.name "${GITNAME}"
+    git config --global user.email "${GITEMAIL}"
+    
 fi
 
 echo "[$PREFIX] Starting code-server..."
